@@ -8,6 +8,7 @@ import (
 var (
 	ErrNotImplemented = errors.New(`repository: not implemented`)
 	ErrNotFound       = errors.New(`repository: not found`)
+	ErrDone           = errors.New(`repository: itrator has no more results`)
 )
 
 // TODO: transaction things with context?
@@ -119,5 +120,5 @@ type Condition interface {
 }
 
 type Iterator[T any] interface {
-	// TODO: iterate!
+	Next() (*T, error)
 }
