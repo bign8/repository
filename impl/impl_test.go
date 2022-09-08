@@ -23,6 +23,7 @@ func TestSubModules(t *testing.T) {
 			t.Log("run the following commands to resolve this")
 			t.Logf("\tpushd impl/%s", name)
 			t.Logf("\tgo mod init github.com/bign8/repository/impl/%s", name)
+			t.Log("\tgo mod tidy")
 			t.Logf("\tpopd")
 			t.Logf("\tgo work use ./impl/%s", name)
 		} else {
