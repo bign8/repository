@@ -17,6 +17,6 @@ Use at your own risk, or create an issue to ask for a 1.0 release.
 
 [appengine datastore]: https://pkg.go.dev/google.golang.org/appengine/datastore
 [go multi-module repositories]: https://github.com/golang/go/wiki/Modules#faqs--multi-module-repositories
-[gorm]: https://pkg.go.dev/github.com/jinzhu/gorm
+[gorm]: https://pkg.go.dev/gorm.io/gorm
 [repository pattern]: https://docs.microsoft.com/en-us/dotnet/architecture/microservices/microservice-ddd-cqrs-patterns/infrastructure-persistence-layer-design#the-repository-pattern
 [sqlstruct]: https://pkg.go.dev/github.com/kisielk/sqlstruct

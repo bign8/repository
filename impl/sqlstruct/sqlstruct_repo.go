@@ -1,14 +1,47 @@
 package sqlstruct
 
-import "github.com/bign8/repository"
+import (
+	"context"
+	"database/sql"
+
+	"github.com/kisielk/sqlstruct"
+
+	"github.com/bign8/repository"
+)
 
 // compile type type checking
 var _ repository.Repository[any] = (*repo[any])(nil)
 
-type repo[T any] struct {
-	// TODO: db connection
+func New[T any](db *sql.DB) (repository.Repository[T], error) {
+	// TODO: perform type checking on T?
+	return &repo[T]{db: db}, nil
 }
 
-func (r *repo[T]) Get(query repository.Query) (*T, error) {
-	return nil, repository.ErrTodo
+type repo[T any] struct {
+	// TODO: db connection
+	db *sql.DB
+}
+
+func (r *repo[T]) Create(ctx context.Context, obj ...*T) error {
+
+	// dumy bit of code to get import to work
+	println(sqlstruct.Columns(obj[0]))
+
+	return repository.ErrNotImplemented
+}
+
+func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (*T, error) {
+	return nil, repository.ErrNotImplemented
+}
+
+func (r *repo[T]) List(ctx context.Context, conds ...repository.Condition) repository.Iterator[T] {
+	return nil
+}
+
+func (r *repo[T]) Update(ctx context.Context, obj ...*T) error {
+	return repository.ErrNotImplemented
+}
+
+func (r *repo[T]) Delete(ctx context.Context, obj ...*T) error {
+	return repository.ErrNotImplemented
 }
