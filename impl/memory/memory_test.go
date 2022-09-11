@@ -12,6 +12,11 @@ type Storable struct {
 	Value string
 }
 
+func (store Storable) GetOrCreateID() (*uint, error) {
+	store.ID = 3
+	return &store.ID, nil
+}
+
 func chk(tb testing.TB, err error, msg string) {
 	if err != nil {
 		tb.Errorf(msg+`: %v`, err)
@@ -19,12 +24,7 @@ func chk(tb testing.TB, err error, msg string) {
 }
 
 func TestCRUD(t *testing.T) {
-	var ctr uint
-	repo, err := memory.New(func(in *Storable) uint {
-		in.ID = ctr
-		ctr++
-		return in.ID
-	})
+	repo, err := memory.New[Storable, uint]()
 	chk(t, err, `memory.New`)
 
 	one := Storable{Value: `one`}

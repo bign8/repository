@@ -2,34 +2,40 @@ package memory
 
 import (
 	"context"
+	"errors"
 
 	"github.com/bign8/repository"
 )
 
-// compile type type checking
-var _ repository.Repository[any] = (*repo[any, int])(nil)
+type Entity[ID comparable] interface {
+	GetOrCreateID() (*ID, error)
+}
 
-type Maker[T any, ID comparable] func(*T) ID
-
-func New[T any, ID comparable](
-	maker Maker[T, ID],
-) (repository.Repository[T], error) {
+func New[T Entity[ID], ID comparable]() (repository.Repository[T], error) {
 	// TODO: perform type checking on T?
 	return &repo[T, ID]{
 		data: make(map[ID]*T, 128),
-		make: maker,
 	}, nil
 }
 
-type repo[T any, ID comparable] struct {
-	data map[ID]*T
-	make Maker[T, ID]
+type repo[T Entity[ID], ID comparable] struct {
+	data    map[ID]*T
+	indexes map[string]btree // attribute => index
 }
 
 func (r *repo[T, ID]) Create(ctx context.Context, obj ...*T) error {
 	for _, o := range obj {
-		id := r.make(o)
-		r.data[id] = o
+		if o == nil {
+			return errors.New(`nil object`)
+		}
+		id, err := (*o).GetOrCreateID()
+		if err != nil {
+			return err
+		}
+		if id == nil {
+			return errors.New(`nil id returned`)
+		}
+		r.data[*id] = o
 	}
 	return nil
 }
