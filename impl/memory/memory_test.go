@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/bign8/repository"
 	"github.com/bign8/repository/impl/memory"
 )
 
@@ -33,7 +34,7 @@ func TestCRUD(t *testing.T) {
 	err = repo.Create(context.TODO(), &one, &two)
 	chk(t, err, `memory.New`)
 
-	v, err := repo.Get(context.TODO())
+	v, err := repo.Get(context.TODO(), repository.Equal(`Value`, `one`))
 	chk(t, err, `repo.Get`)
 	if v.Value != `one` {
 		t.Errorf(`where is "one", got %q`, v.Value)

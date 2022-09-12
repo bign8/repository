@@ -8,7 +8,7 @@ import (
 var (
 	ErrNotImplemented = errors.New(`repository: not implemented`)
 	ErrNotFound       = errors.New(`repository: not found`)
-	ErrDone           = errors.New(`repository: itrator has no more results`)
+	ErrDone           = errors.New(`repository: iterator has no more results`)
 )
 
 // TODO: transaction things with context?
@@ -113,10 +113,6 @@ type Query interface {
 	// Run(c context.Context) *Iterator
 	// Start(c Cursor) *Query
 
-}
-
-type Condition interface {
-	// TODO: strongly typed clause?
 }
 
 type Iterator[T any] interface {
