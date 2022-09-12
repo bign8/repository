@@ -22,22 +22,22 @@ type repo[T any] struct {
 	db *gorm.DB
 }
 
-func (r *repo[T]) Create(ctx context.Context, obj ...*T) error {
+func (r *repo[T]) Create(ctx context.Context, obj ...T) error {
 	return repository.ErrNotImplemented
 }
 
-func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (*T, error) {
-	return nil, repository.ErrNotImplemented
+func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (T, error) {
+	return *new(T), repository.ErrNotImplemented
 }
 
 func (r *repo[T]) List(ctx context.Context, conds ...repository.Condition) repository.Iterator[T] {
 	return nil
 }
 
-func (r *repo[T]) Update(ctx context.Context, obj ...*T) error {
+func (r *repo[T]) Update(ctx context.Context, obj ...T) error {
 	return repository.ErrNotImplemented
 }
 
-func (r *repo[T]) Delete(ctx context.Context, obj ...*T) error {
+func (r *repo[T]) Delete(ctx context.Context, obj ...T) error {
 	return repository.ErrNotImplemented
 }

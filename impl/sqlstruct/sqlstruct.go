@@ -22,7 +22,7 @@ type repo[T any] struct {
 	db *sql.DB
 }
 
-func (r *repo[T]) Create(ctx context.Context, obj ...*T) error {
+func (r *repo[T]) Create(ctx context.Context, obj ...T) error {
 
 	// dumy bit of code to get import to work
 	println(sqlstruct.Columns(obj[0]))
@@ -30,18 +30,18 @@ func (r *repo[T]) Create(ctx context.Context, obj ...*T) error {
 	return repository.ErrNotImplemented
 }
 
-func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (*T, error) {
-	return nil, repository.ErrNotImplemented
+func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (T, error) {
+	return *new(T), repository.ErrNotImplemented
 }
 
 func (r *repo[T]) List(ctx context.Context, conds ...repository.Condition) repository.Iterator[T] {
 	return nil
 }
 
-func (r *repo[T]) Update(ctx context.Context, obj ...*T) error {
+func (r *repo[T]) Update(ctx context.Context, obj ...T) error {
 	return repository.ErrNotImplemented
 }
 
-func (r *repo[T]) Delete(ctx context.Context, obj ...*T) error {
+func (r *repo[T]) Delete(ctx context.Context, obj ...T) error {
 	return repository.ErrNotImplemented
 }

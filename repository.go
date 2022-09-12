@@ -17,19 +17,19 @@ type Repository[T any] interface {
 
 	// Create constructs + stores obj T.
 	// If any identifiers are created as part of the insert, they are mutated on the incomming argument.
-	Create(ctx context.Context, obj ...*T) error
+	Create(ctx context.Context, obj ...T) error
 
 	// Get returns a single item matching a set of conditions
-	Get(ctx context.Context, conds ...Condition) (*T, error)
+	Get(ctx context.Context, conds ...Condition) (T, error)
 
 	// List
 	List(ctx context.Context, conds ...Condition) Iterator[T]
 
 	// Update
-	Update(ctx context.Context, obj ...*T) error
+	Update(ctx context.Context, obj ...T) error
 
 	// Delete
-	Delete(ctx context.Context, obj ...*T) error
+	Delete(ctx context.Context, obj ...T) error
 }
 
 type Query interface {
