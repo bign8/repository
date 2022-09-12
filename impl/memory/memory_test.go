@@ -56,6 +56,13 @@ func TestCRUD(t *testing.T) {
 		t.Errorf(`wanted %s, got %q`, cond, v.Value)
 	}
 
+	cond = repository.Equal(`value`, `one`)
+	v, err = repo.Get(context.TODO(), cond)
+	chk(t, err, `repo.Get`)
+	if v.Value != `one` {
+		t.Errorf(`wanted %s, got %q`, cond, v.Value)
+	}
+
 	v.Value = `one more time!`
 	err = repo.Update(context.TODO(), v)
 	chk(t, err, `repo.Update`)

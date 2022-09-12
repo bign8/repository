@@ -21,18 +21,31 @@ type Entity interface {
 
 func New[T Entity]() (repository.Repository[T], error) {
 	// TODO: perform type checking on T?
-	return &repo[T]{}, nil
+	return &repo[T]{
+		data: map[uint64]T{},
+	}, nil
 }
 
 type repo[T Entity] struct {
-	data    []T
+	ctr     uint64
+	data    map[uint64]T
 	indexes map[string]btree // attribute => index
 }
 
 func (r *repo[T]) Create(ctx context.Context, obj ...T) error {
-	r.data = append(r.data, obj...)
-	// TODO: moar
+	for _, obj := range obj {
+		r.ctr++
+		r.data[r.ctr] = obj
+		r.index(r.ctr, obj.Flatten())
+	}
 	return nil
+}
+
+func (r *repo[T]) index(id uint64, values Values) {
+	for key, value := range values {
+		tree := r.indexes[key]
+		tree.insert(id, value)
+	}
 }
 
 func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (T, error) {
