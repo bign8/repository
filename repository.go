@@ -20,10 +20,10 @@ type Repository[T any] interface {
 	Create(ctx context.Context, obj ...T) error
 
 	// Get returns a single item matching a set of conditions
-	Get(ctx context.Context, conds ...Condition) (T, error)
+	Get(ctx context.Context, cond Condition[T]) (T, error)
 
 	// List
-	List(ctx context.Context, conds ...Condition) Iterator[T]
+	List(ctx context.Context, cond Condition[T]) Iterator[T]
 
 	// Update
 	Update(ctx context.Context, obj ...T) error

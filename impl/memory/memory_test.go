@@ -8,29 +8,9 @@ import (
 	"github.com/bign8/repository/impl/memory"
 )
 
-var _ memory.Entity = (*Storable)(nil)
-
 type Storable struct {
-	ID    uint
+	ID    uint64
 	Value string
-}
-
-func (store Storable) Flatten() memory.Values {
-	return memory.Values{
-		`id`:    memory.Value[uint]{V: store.ID},
-		`value`: memory.Value[string]{V: store.Value},
-	}
-}
-
-func (store *Storable) Hydrate(values memory.Values) {
-	for key, value := range values {
-		switch key {
-		case `id`:
-			store.ID = value.(memory.Value[uint]).V
-		case `value`:
-			store.Value = value.(memory.Value[string]).V
-		}
-	}
 }
 
 func chk(tb testing.TB, err error, msg string) {
@@ -40,7 +20,13 @@ func chk(tb testing.TB, err error, msg string) {
 }
 
 func TestCRUD(t *testing.T) {
-	repo, err := memory.New[*Storable]()
+	repo, err := memory.New(func(s *Storable, id *uint64) {
+		if *id == 0 {
+			*id = s.ID
+		} else {
+			s.ID = *id
+		}
+	})
 	chk(t, err, `memory.New`)
 
 	one := Storable{Value: `one`}
@@ -49,14 +35,18 @@ func TestCRUD(t *testing.T) {
 	err = repo.Create(context.TODO(), &one, &two)
 	chk(t, err, `memory.New`)
 
-	cond := repository.Equal(`value`, `two`)
+	valueAccessor := func(t *Storable) string {
+		return t.Value
+	}
+
+	cond := repository.Equal(`value`, `two`, valueAccessor)
 	v, err := repo.Get(context.TODO(), cond)
 	chk(t, err, `repo.Get`)
 	if v.Value != `two` {
 		t.Errorf(`wanted %s, got %q`, cond, v.Value)
 	}
 
-	cond = repository.Equal(`value`, `one`)
+	cond = repository.Equal(`value`, `one`, valueAccessor)
 	v, err = repo.Get(context.TODO(), cond)
 	chk(t, err, `repo.Get`)
 	if v.Value != `one` {

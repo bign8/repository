@@ -30,11 +30,11 @@ func (r *repo[T]) Create(ctx context.Context, obj ...T) error {
 	return repository.ErrNotImplemented
 }
 
-func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (T, error) {
+func (r *repo[T]) Get(ctx context.Context, cond repository.Condition[T]) (T, error) {
 	return *new(T), repository.ErrNotImplemented
 }
 
-func (r *repo[T]) List(ctx context.Context, conds ...repository.Condition) repository.Iterator[T] {
+func (r *repo[T]) List(ctx context.Context, cond repository.Condition[T]) repository.Iterator[T] {
 	return nil
 }
 

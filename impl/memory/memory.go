@@ -6,63 +6,56 @@ import (
 	"github.com/bign8/repository"
 )
 
-type Value[V comparable] struct {
-	V V
-}
-
-func (v Value[V]) onlyValueImplementsMe() {}
-
-type Values map[string]interface{ onlyValueImplementsMe() }
-
-type Entity interface {
-	Flatten() Values
-	Hydrate(Values)
-}
-
-func New[T Entity]() (repository.Repository[T], error) {
+func New[T any](accessor func(T, *uint64)) (repository.Repository[T], error) {
 	// TODO: perform type checking on T?
 	return &repo[T]{
-		data: map[uint64]T{},
+		data:     make(map[uint64]T, 128),
+		accessor: accessor,
 	}, nil
 }
 
-type repo[T Entity] struct {
-	ctr     uint64
-	data    map[uint64]T
-	indexes map[string]btree // attribute => index
+type repo[T any] struct {
+	ctr      uint64
+	data     map[uint64]T
+	accessor func(T, *uint64) // assign the ID of an object, zero is passed if we need ID
 }
 
 func (r *repo[T]) Create(ctx context.Context, obj ...T) error {
 	for _, obj := range obj {
 		r.ctr++
+		r.accessor(obj, &r.ctr)
 		r.data[r.ctr] = obj
-		r.index(r.ctr, obj.Flatten())
 	}
 	return nil
 }
 
-func (r *repo[T]) index(id uint64, values Values) {
-	for key, value := range values {
-		tree := r.indexes[key]
-		tree.insert(id, value)
-	}
-}
-
-func (r *repo[T]) Get(ctx context.Context, conds ...repository.Condition) (T, error) {
+func (r *repo[T]) Get(ctx context.Context, cond repository.Condition[T]) (T, error) {
 	for _, value := range r.data {
-		return value, nil
+		if cond.Match(value) {
+			return value, nil
+		}
 	}
 	return *new(T), repository.ErrNotFound
 }
 
-func (r *repo[T]) List(ctx context.Context, conds ...repository.Condition) repository.Iterator[T] {
+func (r *repo[T]) List(ctx context.Context, cond repository.Condition[T]) repository.Iterator[T] {
 	return nil
 }
 
 func (r *repo[T]) Update(ctx context.Context, obj ...T) error {
+	for _, obj := range obj {
+		var id uint64
+		r.accessor(obj, &id)
+		r.data[id] = obj
+	}
 	return nil
 }
 
 func (r *repo[T]) Delete(ctx context.Context, obj ...T) error {
+	for _, obj := range obj {
+		var id uint64
+		r.accessor(obj, &id)
+		delete(r.data, id)
+	}
 	return nil
 }
