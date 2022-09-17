@@ -20,17 +20,11 @@ func chk(tb testing.TB, err error, msg string) {
 }
 
 func TestCRUD(t *testing.T) {
-	repo, err := memory.New(func(s *Storable, id *uint64) {
-		if *id == 0 {
-			*id = s.ID
-		} else {
-			s.ID = *id
-		}
-	})
+	repo, err := memory.New(func(s *Storable) uint64 { return s.ID })
 	chk(t, err, `memory.New`)
 
-	one := Storable{Value: `one`}
-	two := Storable{Value: `two`}
+	one := Storable{ID: 1, Value: `one`}
+	two := Storable{ID: 2, Value: `two`}
 
 	err = repo.Create(context.TODO(), &one, &two)
 	chk(t, err, `memory.New`)

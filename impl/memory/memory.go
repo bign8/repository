@@ -6,30 +6,27 @@ import (
 	"github.com/bign8/repository"
 )
 
-func New[T any](accessor func(T, *uint64)) (repository.Repository[T], error) {
+func New[T any, ID comparable](accessor func(T) ID) (repository.Repository[T], error) {
 	// TODO: perform type checking on T?
-	return &repo[T]{
-		data:     make(map[uint64]T, 128),
+	return &repo[T, ID]{
+		data:     make(map[ID]T, 128),
 		accessor: accessor,
 	}, nil
 }
 
-type repo[T any] struct {
-	ctr      uint64
-	data     map[uint64]T
-	accessor func(T, *uint64) // assign the ID of an object, zero is passed if we need ID
+type repo[T any, ID comparable] struct {
+	data     map[ID]T
+	accessor func(T) ID
 }
 
-func (r *repo[T]) Create(ctx context.Context, obj ...T) error {
+func (r *repo[T, ID]) Create(ctx context.Context, obj ...T) error {
 	for _, obj := range obj {
-		r.ctr++
-		r.accessor(obj, &r.ctr)
-		r.data[r.ctr] = obj
+		r.data[r.accessor(obj)] = obj
 	}
 	return nil
 }
 
-func (r *repo[T]) Get(ctx context.Context, cond repository.Condition[T]) (T, error) {
+func (r *repo[T, ID]) Get(ctx context.Context, cond repository.Condition[T]) (T, error) {
 	for _, value := range r.data {
 		if cond.Match(value) {
 			return value, nil
@@ -38,24 +35,20 @@ func (r *repo[T]) Get(ctx context.Context, cond repository.Condition[T]) (T, err
 	return *new(T), repository.ErrNotFound
 }
 
-func (r *repo[T]) List(ctx context.Context, cond repository.Condition[T]) repository.Iterator[T] {
+func (r *repo[T, ID]) List(ctx context.Context, cond repository.Condition[T]) repository.Iterator[T] {
 	return nil
 }
 
-func (r *repo[T]) Update(ctx context.Context, obj ...T) error {
+func (r *repo[T, ID]) Update(ctx context.Context, obj ...T) error {
 	for _, obj := range obj {
-		var id uint64
-		r.accessor(obj, &id)
-		r.data[id] = obj
+		r.data[r.accessor(obj)] = obj
 	}
 	return nil
 }
 
-func (r *repo[T]) Delete(ctx context.Context, obj ...T) error {
+func (r *repo[T, ID]) Delete(ctx context.Context, obj ...T) error {
 	for _, obj := range obj {
-		var id uint64
-		r.accessor(obj, &id)
-		delete(r.data, id)
+		delete(r.data, r.accessor(obj))
 	}
 	return nil
 }
