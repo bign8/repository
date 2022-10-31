@@ -1,0 +1,14 @@
+name: qa-command
+on:
+  repository_dispatch:
+    types: [qa-command]
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add reaction
+        uses: peter-evans/create-or-update-comment@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          comment-id: ${{ github.event.client_payload.github.payload.comment.id }}
+          reaction-type: hooray
